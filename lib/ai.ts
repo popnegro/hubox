@@ -1,35 +1,6 @@
-import { RECLAMOS, SUCURSAL_KPIS, COMENTARIOS } from "./data";
+import { SUCURSAL_KPIS } from "./data";
 import React from "react";
-import type { SucursalKpi } from "./types";
-
-function SimpleTable({ headers, rows }: { headers: string[]; rows: (string | number)[][] }) {
-  return (
-    <div className="overflow-x-auto rounded-lg border border-line">
-      <table className="min-w-full divide-y-2 divide-line bg-surface text-sm">
-        <thead>
-          <tr>
-            {headers.map((h) => (
-              <th key={h} className="whitespace-nowrap px-4 py-2 text-left font-medium text-ink">
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-line">
-          {rows.map((row, i) => (
-            <tr key={i}>
-              {row.map((cell, j) => (
-                <td key={j} className="whitespace-nowrap px-4 py-2 text-muted">
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+import { SimpleTable } from "@/components/ui/SimpleTable";
 
 export function getMockAiResponse(question: string): React.ReactNode {
   const lowerQuestion = question.toLowerCase();
