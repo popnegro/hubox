@@ -15,10 +15,10 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard, active: true },
   { href: "/reclamos", label: "Customer Recovery", icon: MessageSquareWarning, active: true },
-  { href: "/auditorias", label: "Auditorías", icon: ClipboardCheck, active: true },
-  { href: "/acciones", label: "Action Center", icon: KanbanSquare, active: true },
-  { href: "/sucursales", label: "Sucursales", icon: Building2, active: true },
-  { href: "/copilot", label: "AI Copilot", icon: Sparkles, active: true },
+  { href: "#", label: "Auditorías de Calidad", icon: ClipboardCheck, active: false },
+  { href: "#", label: "Action Center", icon: KanbanSquare, active: false },
+  { href: "#", label: "Sucursales", icon: Building2, active: false },
+  { href: "#", label: "AI Copilot", icon: Sparkles, active: false },
 ];
 
 export function Sidebar() {
@@ -38,10 +38,7 @@ export function Sidebar() {
 
       <nav className="flex-1 space-y-1 px-3">
         {NAV.map((item) => {
-          const isActive =
-            item.href === "/"
-              ? pathname === item.href
-              : pathname.startsWith(item.href);
+          const isActive = item.active && pathname === item.href;
           const Icon = item.icon;
           return (
             <Link

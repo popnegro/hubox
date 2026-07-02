@@ -1,64 +1,100 @@
 import { Topbar } from "@/components/layout/Topbar";
 import { KpiCard } from "@/components/dashboard/KpiCard";
+import { TrendChart } from "@/components/dashboard/TrendChart";
+import { SucursalChart } from "@/components/dashboard/SucursalChart";
 import { Card } from "@/components/ui/Card";
 import { Badge, riesgoTone, prioridadTone } from "@/components/ui/Badge";
-import { getReclamos, SUCURSAL_KPIS, TREND, getDashboardKpis } from "@/lib/data";
+import { RECLAMOS, SUCURSAL_KPIS, TREND, getDashboardKpis } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
 import { Gauge, MessageSquareWarning, Clock3, AlertTriangle } from "lucide-react";
 import Link from "next/link";
-import type { Reclamo } from "@/lib/types";
-import { DashboardClient } from "./DashboardClient";
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
   const kpis = getDashboardKpis();
-  const reclamos = await getReclamos();
-  const criticos = reclamos.filter((r) => r.riesgo === "Crítico" && r.estado !== "Resuelto").slice(0, 5);
+  const criticos = RECLAMOS.filter((r) => r.riesgo === "Crítico" && r.estado !== "Resuelto").slice(0, 5);
 
   return (
     <>
       <Topbar
         title="Executive Dashboard"
-        subtitle="Visión general de la performance y estado de la operación."
+        subtitle="Visión general de calidad y experiencia del cliente — Grupo Lorenzo"
       />
+
       <main className="flex-1 space-y-6 p-6">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-          <KpiCard label="NPS" value={String(kpis.nps)} delta="+2.5" deltaTone="positive" icon={Gauge} />
-          <KpiCard label="CSAT" value={`${kpis.csat}%`} delta="+1.2" deltaTone="positive" icon={Gauge} />
-          <KpiCard label="Reclamos Abiertos" value={String(kpis.reclamosAbiertos)} delta="-3" deltaTone="positive" icon={MessageSquareWarning} />
-          <KpiCard label="Clientes Críticos" value={String(kpis.clientesCriticos)} delta="+1" deltaTone="critical" icon={AlertTriangle} />
-          <KpiCard label="Tpo. Prom. Res." value={`${kpis.tiempoPromedioHoras}hs`} delta="-8%" deltaTone="positive" icon={Clock3} />
-          <KpiCard label="Total Reclamos" value={String(kpis.totalReclamos)} delta="+10" deltaTone="neutral" icon={MessageSquareWarning} />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <KpiCard label="NPS actual" value={String(kpis.nps)} delta="+7 vs. mes anterior" icon={Gauge} />
+          <KpiCard label="CSAT actual" value={`${kpis.csat}%`} delta="+2 pts vs. mes anterior" icon={Gauge} />
+          <KpiCard
+            label="Reclamos abiertos"
+            value={String(kpis.reclamosAbiertos)}
+            delta={`${kpis.totalReclamos} reclamos totales (45 días)`}
+            deltaTone="critical"
+            icon={MessageSquareWarning}
+          />
+          <KpiCard
+            label="Tiempo prom. resolución"
+            value={`${kpis.tiempoPromedioHoras} hs`}
+            delta="Meta: 24 hs"
+            deltaTone="critical"
+            icon={Clock3}
+          />
         </div>
 
-        <DashboardClient trendData={TREND} sucursalKpis={SUCURSAL_KPIS} />
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Card className="p-5 lg:col-span-2">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-ink">Tendencia NPS / CSAT</p>
+                <p className="text-xs text-muted">Últimos 6 meses</p>
+              </div>
+              <div className="flex gap-3 text-xs">
+                <span className="flex items-center gap-1.5 text-muted"><span className="h-2 w-2 rounded-full bg-lorenzo" />NPS</span>
+                <span className="flex items-center gap-1.5 text-muted"><span className="h-2 w-2 rounded-full bg-signal-info" />CSAT</span>
+              </div>
+            </div>
+            <TrendChart data={TREND} />
+          </Card>
+
+          <Card className="p-5">
+            <p className="text-sm font-semibold text-ink">Ranking de sucursales</p>
+            <p className="mb-4 text-xs text-muted">Por NPS</p>
+            <SucursalChart data={SUCURSAL_KPIS} />
+          </Card>
+        </div>
 
         <Card className="p-5">
           <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-ink">Clientes Críticos</p>
-              <p className="text-xs text-muted">Reclamos abiertos con riesgo crítico.</p>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-signal-critical" />
+              <p className="text-sm font-semibold text-ink">Clientes en riesgo crítico</p>
             </div>
             <Link href="/reclamos" className="text-xs font-medium text-lorenzo hover:underline">
-              Ver todos
+              Ver todos los reclamos →
             </Link>
           </div>
-          <div className="flow-root">
-            <div className="-my-2 divide-y divide-line">
-              {criticos.map((r: Reclamo) => (
-                <Link key={r.id} href={`/reclamos/${r.id}`} className="flex items-center gap-4 py-3 hover:bg-canvas">
-                  <div className="w-40">
-                    <p className="truncate text-xs font-medium text-ink">{r.cliente}</p>
-                    <p className="truncate text-xs text-muted">{r.sucursal}</p>
+
+          {criticos.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted">
+              No hay clientes en riesgo crítico abiertos en este momento.
+            </p>
+          ) : (
+            <div className="divide-y divide-line">
+              {criticos.map((r) => (
+                <div key={r.id} className="flex items-center justify-between gap-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-ink">{r.cliente}</p>
+                    <p className="text-xs text-muted">
+                      {r.sucursal} · {r.vehiculo} · {formatDate(r.fecha)}
+                    </p>
                   </div>
-                  <p className="flex-1 truncate text-xs text-muted">{r.detalle}</p>
-                  <div className="flex w-48 items-center justify-end gap-4">
+                  <div className="flex items-center gap-2">
                     <Badge tone={prioridadTone(r.prioridad)}>{r.prioridad}</Badge>
-                    <span className="w-20 text-right text-xs text-muted">{formatDate(r.fecha)}</span>
+                    <Badge tone={riesgoTone(r.riesgo)}>{r.riesgo}</Badge>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
-          </div>
+          )}
         </Card>
       </main>
     </>
