@@ -7,7 +7,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export default function ReclamoDetailPage({ params }: { params: { id: string } }) {
+// Explicitly define the props type
+interface ReclamoDetailPageProps {
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+export default function ReclamoDetailPage({ params }: ReclamoDetailPageProps) {
   const reclamo = RECLAMOS.find((r) => r.id === params.id);
 
   if (!reclamo) {

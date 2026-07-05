@@ -7,7 +7,7 @@ import Link from "next/link";
 export function KanbanCard({ task }: { task: KanbanTask }) {
   const isDue = new Date(task.dueDate) < new Date();
   
-  const sourceLink = task.sourceType === 'Reclamo' ? `/reclamos?id=${task.sourceId}` : `/auditorias/${task.sourceId}`;
+  const sourceLink = task.sourceType === 'Reclamo' ? `/reclamos/${task.sourceId}` : `/auditorias/${task.sourceId}`;
   
   return (
     <div className="rounded-lg border border-line bg-surface p-4 shadow-sm">

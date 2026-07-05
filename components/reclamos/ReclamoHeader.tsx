@@ -8,8 +8,10 @@ export function ReclamoHeader({ reclamo }: { reclamo: Reclamo }) {
     <div className="rounded-xl2 border border-line bg-surface p-6 shadow-card">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-muted">{reclamo.id}</p>
-          <h1 className="mt-1 text-xl font-bold text-ink">{reclamo.cliente}</h1>
+          <h1 className="text-xl font-bold text-ink">Reclamo #{reclamo.id}</h1>
+          <p className="mt-1 text-sm text-muted">
+            Cliente: {reclamo.cliente}
+          </p>
         </div>
         <div className="flex flex-wrap gap-1.5">
             <Badge tone={prioridadTone(reclamo.prioridad)}>Prioridad {reclamo.prioridad}</Badge>
