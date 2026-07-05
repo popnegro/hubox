@@ -6,13 +6,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export default function AuditoriaDetailPage({
-  params,
-}: {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
-  const audit = AUDITORIAS.find((a) => a.id === params.id);
+export async function generateStaticParams() {
+  return AUDITORIAS.map((audit) => ({
+    id: audit.id,
+  }));
+}
+
+export default async function AuditoriaDetailPage(
+  props: {
+    params: { id: string };
+    searchParams?: { [key: string]: string | string[] | undefined };
+  }
+) {
+  const audit = AUDITORIAS.find((a) => a.id === props.params.id);
 
   if (!audit) {
     notFound();

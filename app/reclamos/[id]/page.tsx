@@ -7,13 +7,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export default function ReclamoDetailPage({
-  params,
-}: {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
-  const reclamo = RECLAMOS.find((r) => r.id === params.id);
+export async function generateStaticParams() {
+  return RECLAMOS.map((reclamo) => ({
+    id: reclamo.id,
+  }));
+}
+
+export default async function ReclamoDetailPage(
+  props: {
+    params: { id: string };
+    searchParams?: { [key: string]: string | string[] | undefined };
+  }
+) {
+  const reclamo = RECLAMOS.find((r) => r.id === props.params.id);
 
   if (!reclamo) {
     notFound();
