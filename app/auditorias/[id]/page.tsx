@@ -6,13 +6,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-// Explicitly define the props type
-interface AuditoriaDetailPageProps {
+export default function AuditoriaDetailPage({
+  params,
+}: {
   params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
-}
-
-export default function AuditoriaDetailPage({ params }: AuditoriaDetailPageProps) {
+}) {
   const audit = AUDITORIAS.find((a) => a.id === params.id);
 
   if (!audit) {
