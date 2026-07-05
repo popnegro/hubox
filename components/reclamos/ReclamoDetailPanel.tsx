@@ -1,6 +1,7 @@
 "use client";
 
-import type { Reclamo } from "@/lib/types";
+import { useState, useEffect } from "react";
+import type { Reclamo, IaAnalysis } from "@/lib/types";
 import { Badge, riesgoTone, prioridadTone, estadoTone } from "@/components/ui/Badge";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import { X, Sparkles, Clock, MapPin, Car } from "lucide-react";
@@ -13,6 +14,46 @@ export function ReclamoDetailPanel({
   onClose: () => void;
 }) {
   const open = reclamo !== null;
+  const [iaAnalysis, setIaAnalysis] = useState<IaAnalysis | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (reclamo) {
+      const fetchIaAnalysis = async () => {
+        setIsLoading(true);
+        setError(null);
+        setIaAnalysis(null);
+
+        try {
+          const response = await fetch("/api/copilot", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              detalle: reclamo.detalle,
+              prioridad: reclamo.prioridad,
+              riesgo: reclamo.riesgo,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Error al obtener el análisis de la IA.");
+          }
+
+          const data: IaAnalysis = await response.json();
+          setIaAnalysis(data);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Ocurrió un error inesperado.");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchIaAnalysis();
+    }
+  }, [reclamo]);
 
   return (
     <>
@@ -76,27 +117,42 @@ export function ReclamoDetailPanel({
               </div>
 
               {/* Bloque IA */}
-              <div className="rounded-xl2 border border-lorenzo/20 bg-lorenzo/5 p-4">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-lorenzo">
-                  <Sparkles className="h-4 w-4" />
-                  Análisis del Copiloto IA
+              <div className="min-h-[200px] rounded-xl2 border border-lorenzo/20 bg-lorenzo/5 p-4">
+                <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-lorenzo">
+                  <Sparkles className={`h-4 w-4 ${isLoading ? "animate-pulse" : ""}`} />
+                  {isLoading ? "Analizando con IA..." : "Análisis del Copiloto IA"}
                 </div>
-                <p className="text-sm text-ink/90">{reclamo.ia.resumen}</p>
-                <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
-                  <div className="rounded-lg bg-surface px-3 py-2">
-                    <p className="text-muted">Sentimiento</p>
-                    <p className="font-medium text-ink">{reclamo.ia.sentimiento}</p>
+
+                {isLoading && (
+                  <IaCopilotSkeleton />
+                )}
+
+                {error && (
+                  <div className="flex h-40 items-center justify-center rounded-lg bg-red-500/10 text-center">
+                    <p className="text-sm text-red-700">Error del Copiloto: {error}</p>
                   </div>
-                  <div className="rounded-lg bg-surface px-3 py-2">
-                    <p className="text-muted">Prob. de abandono</p>
-                    <p className="font-medium text-ink">{reclamo.ia.probabilidadAbandono}%</p>
-                  </div>
-                </div>
-                <div className="mt-3 rounded-lg bg-surface px-3 py-2 text-xs">
-                  <p className="text-muted">Acción sugerida</p>
-                  <p className="mt-0.5 font-medium text-ink">{reclamo.ia.accionSugerida}</p>
-                  <p className="mt-1 text-muted">Tiempo recomendado de respuesta: {reclamo.ia.tiempoRecomendado}</p>
-                </div>
+                )}
+
+                {iaAnalysis && !isLoading && (
+                  <>
+                    <p className="text-sm text-ink/90">{iaAnalysis.resumen}</p>
+                    <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
+                      <div className="rounded-lg bg-surface px-3 py-2">
+                        <p className="text-muted">Sentimiento</p>
+                        <p className="font-medium text-ink">{iaAnalysis.sentimiento}</p>
+                      </div>
+                      <div className="rounded-lg bg-surface px-3 py-2">
+                        <p className="text-muted">Prob. de abandono</p>
+                        <p className="font-medium text-ink">{iaAnalysis.probabilidadAbandono}%</p>
+                      </div>
+                    </div>
+                    <div className="mt-3 rounded-lg bg-surface px-3 py-2 text-xs">
+                      <p className="text-muted">Acción sugerida</p>
+                      <p className="mt-0.5 font-medium text-ink">{iaAnalysis.accionSugerida}</p>
+                      <p className="mt-1 text-muted">Tiempo recomendado de respuesta: {iaAnalysis.tiempoRecomendado}</p>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Timeline */}
@@ -125,3 +181,22 @@ export function ReclamoDetailPanel({
     </>
   );
 }
+
+function IaCopilotSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="space-y-2">
+        <div className="h-3 rounded bg-gray-200/80"></div>
+        <div className="h-3 w-5/6 rounded bg-gray-200/80"></div>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="h-14 rounded-lg bg-gray-200/80"></div>
+        <div className="h-14 rounded-lg bg-gray-200/80"></div>
+      </div>
+      <div className="mt-3 h-20 rounded-lg bg-gray-200/80"></div>
+    </div>
+  );
+
+}
+
+export default ReclamoDetailPanel;

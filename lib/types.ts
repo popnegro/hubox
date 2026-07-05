@@ -9,6 +9,14 @@ export type Origen =
   | "Llamada"
   | "Presencial";
 
+export interface IaAnalysis {
+  resumen: string;
+  sentimiento: "Negativo" | "Mixto" | "Neutro" | "Positivo";
+  probabilidadAbandono: number; // 0-100
+  accionSugerida: string;
+  tiempoRecomendado: string;
+}
+
 export interface Reclamo {
   id: string;
   cliente: string;
@@ -25,13 +33,7 @@ export interface Reclamo {
   ultimaInteraccion: string; // ISO
   satisfaccion: number; // 1-5
   detalle: string;
-  ia: {
-    resumen: string;
-    sentimiento: "Negativo" | "Mixto" | "Neutro" | "Positivo";
-    probabilidadAbandono: number; // 0-100
-    accionSugerida: string;
-    tiempoRecomendado: string;
-  };
+  ia: IaAnalysis;
   timeline: { fecha: string; evento: string }[];
 }
 
