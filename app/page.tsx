@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge, riesgoTone, prioridadTone } from "@/components/ui/Badge";
 import { RECLAMOS, SUCURSAL_KPIS, TREND, getDashboardKpis } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
-import { Gauge, MessageSquareWarning, Clock3, AlertTriangle } from "lucide-react";
+import { Gauge, MessageSquareWarning, Clock3, AlertTriangle, ArrowUp, ArrowDown } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -22,9 +22,28 @@ export default function DashboardPage() {
 
       <main className="flex-1 space-y-6 p-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard label="NPS actual" value={String(kpis.nps)} delta="+7 vs. mes anterior" icon={Gauge} />
-          <KpiCard label="CSAT actual" value={`${kpis.csat}%`} delta="+2 pts vs. mes anterior" icon={Gauge} />
           <KpiCard
+            label="NPS actual"
+            value={String(kpis.nps)}
+            delta={
+              <span className="flex items-center gap-1">
+                <ArrowUp className="h-3 w-3" /> +7 vs. mes anterior
+              </span>
+            }
+            icon={Gauge}
+          />
+          <KpiCard
+            label="CSAT actual"
+            value={`${kpis.csat}%`}
+            delta={
+              <span className="flex items-center gap-1">
+                <ArrowUp className="h-3 w-3" /> +2 pts vs. mes anterior
+              </span>
+            }
+            icon={Gauge}
+          />
+          <KpiCard
+            href="/reclamos"
             label="Reclamos abiertos"
             value={String(kpis.reclamosAbiertos)}
             delta={`${kpis.totalReclamos} reclamos totales (45 días)`}
@@ -80,18 +99,24 @@ export default function DashboardPage() {
           ) : (
             <div className="divide-y divide-line">
               {criticos.map((r) => (
-                <div key={r.id} className="flex items-center justify-between gap-4 py-3">
-                  <div>
-                    <p className="text-sm font-medium text-ink">{r.cliente}</p>
-                    <p className="text-xs text-muted">
-                      {r.sucursal} · {r.vehiculo} · {formatDate(r.fecha)}
-                    </p>
+                <Link
+                  key={r.id}
+                  href={`/reclamos/${r.id}`}
+                  className="block transition-colors hover:bg-canvas"
+                >
+                  <div className="flex items-center justify-between gap-4 px-2 py-3">
+                    <div>
+                      <p className="text-sm font-medium text-ink">{r.cliente}</p>
+                      <p className="text-xs text-muted">
+                        {r.sucursal} · {r.vehiculo} · {formatDate(r.fecha)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge tone={prioridadTone(r.prioridad)}>{r.prioridad}</Badge>
+                      <Badge tone={riesgoTone(r.riesgo)}>{r.riesgo}</Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge tone={prioridadTone(r.prioridad)}>{r.prioridad}</Badge>
-                    <Badge tone={riesgoTone(r.riesgo)}>{r.riesgo}</Badge>
-                  </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

@@ -61,9 +61,12 @@ export default async function ReclamoDetailPage(
                              <button className="w-full rounded-lg bg-lorenzo py-2.5 text-sm font-semibold text-white hover:bg-lorenzo-light">
                                 Contactar al cliente
                             </button>
-                            <button className="mt-2 w-full rounded-lg border border-line bg-canvas py-2.5 text-sm font-semibold text-ink hover:bg-line">
+                            <Link
+                              href="/action-center"
+                              className="mt-2 block w-full rounded-lg border border-line bg-canvas py-2.5 text-center text-sm font-semibold text-ink hover:bg-line"
+                            >
                                 Crear Plan de Acción
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
