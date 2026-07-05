@@ -41,3 +41,9 @@ export function estadoTone(estado: string): Tone {
   if (estado === "Esperando cliente") return "warning";
   return "neutral";
 }
+
+export function puntajeTone(puntaje: number): Tone {
+  if (puntaje < 50) return "critical";
+  if (puntaje < 80) return "warning";
+  return "good";
+}

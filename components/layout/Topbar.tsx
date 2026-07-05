@@ -1,11 +1,37 @@
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
-export function Topbar({ title, subtitle }: { title: string; subtitle?: string }) {
+interface Breadcrumb {
+  label: string;
+  href: string;
+}
+
+export function Topbar({
+  title,
+  subtitle,
+  breadcrumbs,
+}: {
+  title: string;
+  subtitle?: string;
+  breadcrumbs?: Breadcrumb[];
+}) {
   return (
     <header className="flex items-center justify-between gap-4 border-b border-line bg-surface/80 px-6 py-4 backdrop-blur">
       <div>
+        {breadcrumbs ? (
+          <nav className="mb-1 flex items-center text-sm font-medium text-muted">
+            {breadcrumbs.map((b, i) => (
+              <div key={b.href} className="flex items-center">
+                {i > 0 && <ChevronRight className="mx-1 h-4 w-4" />}
+                <Link href={b.href} className="hover:text-ink">
+                  {b.label}
+                </Link>
+              </div>
+            ))}
+          </nav>
+        ) : null}
         <h1 className="text-lg font-semibold tracking-tight text-ink">{title}</h1>
-        {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
+        {subtitle && !breadcrumbs && <p className="text-sm text-muted">{subtitle}</p>}
       </div>
 
       <div className="flex items-center gap-3">

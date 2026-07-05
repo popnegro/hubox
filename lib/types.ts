@@ -50,3 +50,33 @@ export interface TrendPoint {
   nps: number;
   csat: number;
 }
+
+export interface ChecklistItem {
+  id: number;
+  pregunta: string;
+  respuesta: "si" | "no" | "na";
+  observaciones: string;
+}
+
+export interface Auditoria {
+  id: string;
+  fecha: string; // ISO
+  auditor: string;
+  sucursal: string;
+  checklist: ChecklistItem[];
+  puntaje: number;
+}
+
+export type KanbanStatus = "Por hacer" | "En progreso" | "Hecho";
+
+export interface KanbanTask {
+  id: string;
+  title: string;
+  description: string;
+  status: KanbanStatus;
+  dueDate: string; // ISO
+  owner: string;
+  sourceId: string; // ID of Reclamo or Auditoria
+  sourceType: "Reclamo" | "Auditoría";
+  priority: "Alta" | "Media" | "Baja";
+}

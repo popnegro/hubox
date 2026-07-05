@@ -4,13 +4,13 @@ import { useMemo, useState } from "react";
 import type { Reclamo } from "@/lib/types";
 import { Badge, riesgoTone, prioridadTone, estadoTone } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
-import { ReclamoDetailPanel } from "@/components/reclamos/ReclamoDetailPanel";
 import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function ReclamosTable({ reclamos }: { reclamos: Reclamo[] }) {
   const [query, setQuery] = useState("");
   const [estadoFiltro, setEstadoFiltro] = useState<string>("Todos");
-  const [selected, setSelected] = useState<Reclamo | null>(null);
+  const router = useRouter();
 
   const estados = ["Todos", "Nuevo", "En curso", "Esperando cliente", "Resuelto"];
 
@@ -73,7 +73,7 @@ export function ReclamosTable({ reclamos }: { reclamos: Reclamo[] }) {
               {filtered.map((r) => (
                 <tr
                   key={r.id}
-                  onClick={() => setSelected(r)}
+                  onClick={() => router.push(`/reclamos/${r.id}`)}
                   className="cursor-pointer border-b border-line last:border-0 hover:bg-canvas"
                 >
                   <td className="px-4 py-3 font-medium text-ink">{r.id}</td>
@@ -109,8 +109,6 @@ export function ReclamosTable({ reclamos }: { reclamos: Reclamo[] }) {
       <p className="mt-3 text-xs text-muted">
         Mostrando {filtered.length} de {reclamos.length} reclamos
       </p>
-
-      <ReclamoDetailPanel reclamo={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }

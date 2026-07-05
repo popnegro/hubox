@@ -1,4 +1,17 @@
-import type { Reclamo, SucursalKpi, TrendPoint, Prioridad, Riesgo, Estado, Origen } from "./types";
+import type {
+  Reclamo,
+  SucursalKpi,
+  TrendPoint,
+  Prioridad,
+  Riesgo,
+  Estado,
+  Origen,
+  Auditoria,
+  ChecklistItem,
+  KanbanStatus,
+  KanbanTask,
+} from "./types";
+
 
 // PRNG simple con semilla fija para que los datos sean siempre los mismos
 // entre build y deploy (reproducible, sin librerías externas).
@@ -172,3 +185,107 @@ export function getDashboardKpis() {
     tiempoPromedioHoras: Math.round(tiempoProm),
   };
 }
+
+const CHECKLIST_PREGUNTAS = [
+  // Recepción y Entrega
+  "¿El personal de recepción fue amable y profesional?",
+  "¿Se explicó claramente el trabajo a realizar y los costos asociados?",
+  "¿El vehículo se entregó en la fecha y hora prometidas?",
+  "¿El vehículo se entregó limpio (interior y exterior)?",
+  // Calidad del Trabajo
+  "¿La reparación o el servicio solucionó el problema original?",
+  "¿El vehículo presenta algún nuevo desperfecto o problema tras el servicio?",
+  "¿Se utilizaron repuestos originales o de calidad equivalente?",
+  // Instalaciones
+  "¿La sala de espera estaba limpia y confortable?",
+  "¿Se ofreció café o agua al cliente?",
+  // Proceso y Comunicación
+  "¿Se mantuvo al cliente informado sobre el progreso del trabajo?",
+  "¿El proceso de facturación y pago fue claro y eficiente?",
+];
+
+function generarAuditorias(cantidad: number): Auditoria[] {
+  const out: Auditoria[] = [];
+  for (let i = 0; i < cantidad; i++) {
+    const diasAtras = int(0, 90);
+    const fecha = new Date(Date.now() - diasAtras * 24 * 60 * 60 * 1000);
+    const sucursal = pick(SUCURSALES);
+    const auditor = pick(RESPONSABLES);
+
+    let puntajeTotal = 0;
+    const checklist: ChecklistItem[] = CHECKLIST_PREGUNTAS.map((pregunta, index) => {
+      const respuestas: Array<"si" | "no" | "na"> = ["si", "si", "si", "si", "no", "na"];
+      const respuesta = pick(respuestas);
+      const tieneObservacion = rand() > 0.7;
+      let observaciones = "";
+      if (respuesta === "no" && tieneObservacion) {
+        observaciones = "El cliente reportó disconformidad con este punto.";
+      } else if (tieneObservacion) {
+        observaciones = "Sin comentarios adicionales del cliente.";
+      }
+
+      if (respuesta === 'si') {
+        puntajeTotal += 1;
+      }
+
+      return {
+        id: index + 1,
+        pregunta,
+        respuesta,
+        observaciones,
+      };
+    });
+
+    const puntaje = Math.round((puntajeTotal / CHECKLIST_PREGUNTAS.filter(p => p !== "").length) * 100);
+
+    out.push({
+      id: `AU-${String(1000 + i)}`,
+      fecha: fecha.toISOString(),
+      auditor,
+      sucursal,
+      checklist,
+      puntaje,
+    });
+  }
+  return out.sort((a, b) => +new Date(b.fecha) - +new Date(a.fecha));
+}
+
+export const AUDITORIAS: Auditoria[] = generarAuditorias(15);
+
+function generarKanbanTasks(): KanbanTask[] {
+  const tasks: KanbanTask[] = [];
+  const statuses: KanbanStatus[] = ["Por hacer", "En progreso", "Hecho"];
+
+  RECLAMOS.filter(r => r.riesgo === 'Crítico' || r.prioridad === 'Alta').slice(0, 5).forEach((reclamo, i) => {
+    tasks.push({
+      id: `T-${1000 + i}`,
+      title: `Resolver reclamo crítico #${reclamo.id}`,
+      description: `Acción requerida para: ${reclamo.detalle}`,
+      status: pick(statuses),
+      dueDate: new Date(Date.now() + int(2, 14) * 24 * 60 * 60 * 1000).toISOString(),
+      owner: reclamo.responsable,
+      sourceId: reclamo.id,
+      sourceType: "Reclamo",
+      priority: reclamo.prioridad,
+    });
+  });
+
+  AUDITORIAS.filter(a => a.puntaje < 80).slice(0, 5).forEach((auditoria, i) => {
+    const itemConObs = auditoria.checklist.find(item => item.respuesta === 'no' && item.observaciones);
+    tasks.push({
+      id: `T-${2000 + i}`,
+      title: `Mejorar punto bajo en auditoría #${auditoria.id}`,
+      description: itemConObs ? `Atender observación: "${itemConObs.observaciones}"` : 'Revisar puntos con baja calificación en la auditoría.',
+      status: pick(statuses),
+      dueDate: new Date(Date.now() + int(5, 20) * 24 * 60 * 60 * 1000).toISOString(),
+      owner: pick(RESPONSABLES),
+      sourceId: auditoria.id,
+      sourceType: "Auditoría",
+      priority: auditoria.puntaje < 50 ? 'Alta' : 'Media',
+    });
+  });
+
+  return tasks.sort((a,b) => +new Date(a.dueDate) - +new Date(b.dueDate));
+}
+
+export const KANBAN_TASKS: KanbanTask[] = generarKanbanTasks();
