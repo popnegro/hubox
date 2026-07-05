@@ -6,6 +6,7 @@ import { Badge, puntajeTone } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { Search, ArrowUp, ArrowDown } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { AuditoriaCard } from "./AuditoriaCard";
 
 type SortDirection = "asc" | "desc";
 type SortKey = keyof Auditoria | "";
@@ -101,65 +102,77 @@ export function AuditoriasTable({ auditorias }: { auditorias: Auditoria[] }) {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl2 border border-line bg-surface shadow-card">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[860px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-line bg-canvas text-xs uppercase tracking-wide text-muted">
-                <th className="px-4 py-3 font-medium">
-                  <button onClick={() => requestSort("id")} className="flex items-center">
-                    ID {getSortIcon("id")}
-                  </button>
-                </th>
-                <th className="px-4 py-3 font-medium">
-                  <button onClick={() => requestSort("sucursal")} className="flex items-center">
-                    Sucursal {getSortIcon("sucursal")}
-                  </button>
-                </th>
-                <th className="px-4 py-3 font-medium">
-                  <button onClick={() => requestSort("auditor")} className="flex items-center">
-                    Auditor {getSortIcon("auditor")}
-                  </button>
-                </th>
-                <th className="px-4 py-3 font-medium">
-                  <button onClick={() => requestSort("fecha")} className="flex items-center">
-                    Fecha {getSortIcon("fecha")}
-                  </button>
-                </th>
-                <th className="px-4 py-3 font-medium text-right">
-                  <button onClick={() => requestSort("puntaje")} className="flex items-center justify-end w-full">
-                    Puntaje {getSortIcon("puntaje")}
-                  </button>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedData.map((a) => (
-                <tr
-                  key={a.id}
-                  onClick={() => router.push(`/auditorias/${a.id}`)}
-                  className="cursor-pointer border-b border-line last:border-0 hover:bg-canvas"
-                >
-                  <td className="px-4 py-3 font-medium text-ink">{a.id}</td>
-                  <td className="px-4 py-3 text-ink/80">{a.sucursal}</td>
-                  <td className="px-4 py-3 text-ink/80">{a.auditor}</td>
-                  <td className="px-4 py-3 text-ink/70">{formatDate(a.fecha)}</td>
-                  <td className="px-4 py-3 text-right">
-                    <Badge tone={puntajeTone(a.puntaje)}>{a.puntaje}%</Badge>
-                  </td>
+      {/* Vista de Tabla para Desktop (lg y superior) */}
+      <div className="hidden lg:block">
+        <div className="overflow-hidden rounded-xl2 border border-line bg-surface shadow-card">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[860px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-line bg-canvas text-xs uppercase tracking-wide text-muted">
+                  <th className="px-4 py-3 font-medium">
+                    <button onClick={() => requestSort("id")} className="flex items-center">
+                      ID {getSortIcon("id")}
+                    </button>
+                  </th>
+                  <th className="px-4 py-3 font-medium">
+                    <button onClick={() => requestSort("sucursal")} className="flex items-center">
+                      Sucursal {getSortIcon("sucursal")}
+                    </button>
+                  </th>
+                  <th className="px-4 py-3 font-medium">
+                    <button onClick={() => requestSort("auditor")} className="flex items-center">
+                      Auditor {getSortIcon("auditor")}
+                    </button>
+                  </th>
+                  <th className="px-4 py-3 font-medium">
+                    <button onClick={() => requestSort("fecha")} className="flex items-center">
+                      Fecha {getSortIcon("fecha")}
+                    </button>
+                  </th>
+                  <th className="px-4 py-3 font-medium text-right">
+                    <button
+                      onClick={() => requestSort("puntaje")}
+                      className="flex w-full items-center justify-end"
+                    >
+                      Puntaje {getSortIcon("puntaje")}
+                    </button>
+                  </th>
                 </tr>
-              ))}
-              {paginatedData.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-sm text-muted">
-                    No se encontraron auditorías con ese criterio.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {paginatedData.map((a) => (
+                  <tr
+                    key={a.id}
+                    onClick={() => router.push(`/auditorias/${a.id}`)}
+                    className="cursor-pointer border-b border-line last:border-0 hover:bg-canvas"
+                  >
+                    <td className="px-4 py-3 font-medium text-ink">{a.id}</td>
+                    <td className="px-4 py-3 text-ink/80">{a.sucursal}</td>
+                    <td className="px-4 py-3 text-ink/80">{a.auditor}</td>
+                    <td className="px-4 py-3 text-ink/70">{formatDate(a.fecha)}</td>
+                    <td className="px-4 py-3 text-right">
+                      <Badge tone={puntajeTone(a.puntaje)}>{a.puntaje}%</Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+
+      {/* Vista de Tarjetas para Mobile (debajo de lg) */}
+      <div className="lg:hidden">
+        {paginatedData.map((a) => (
+          <AuditoriaCard key={a.id} auditoria={a} />
+        ))}
+      </div>
+
+      {(paginatedData.length === 0) && (
+        <div className="w-full px-4 py-12 text-center text-sm text-muted rounded-xl2 border border-line bg-surface shadow-card lg:border-none lg:shadow-none lg:bg-transparent">
+          No se encontraron auditorías con ese criterio.
+        </div>
+      )}
 
       <div className="mt-4 flex items-center justify-between">
         <p className="text-xs text-muted">
@@ -175,7 +188,7 @@ export function AuditoriasTable({ auditorias }: { auditorias: Auditoria[] }) {
           </button>
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === totalPages || totalPages === 0}
             className="rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink disabled:opacity-50"
           >
             Siguiente

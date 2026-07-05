@@ -1,5 +1,6 @@
 import { Search, Bell, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { MobileNav } from "./MobileNav";
 
 interface Breadcrumb {
   label: string;
@@ -17,21 +18,24 @@ export function Topbar({
 }) {
   return (
     <header className="flex items-center justify-between gap-4 border-b border-line bg-surface/80 px-6 py-4 backdrop-blur">
-      <div>
-        {breadcrumbs ? (
-          <nav className="mb-1 flex items-center text-sm font-medium text-muted">
-            {breadcrumbs.map((b, i) => (
-              <div key={b.href} className="flex items-center">
-                {i > 0 && <ChevronRight className="mx-1 h-4 w-4" />}
-                <Link href={b.href} className="hover:text-ink">
-                  {b.label}
-                </Link>
-              </div>
-            ))}
-          </nav>
-        ) : null}
-        <h1 className="text-lg font-semibold tracking-tight text-ink">{title}</h1>
-        {subtitle && !breadcrumbs && <p className="text-sm text-muted">{subtitle}</p>}
+      <div className="flex items-center gap-4">
+        <MobileNav />
+        <div>
+          {breadcrumbs ? (
+            <nav className="mb-1 flex items-center text-sm font-medium text-muted">
+              {breadcrumbs.map((b, i) => (
+                <div key={b.href} className="flex items-center">
+                  {i > 0 && <ChevronRight className="mx-1 h-4 w-4" />}
+                  <Link href={b.href} className="hover:text-ink">
+                    {b.label}
+                  </Link>
+                </div>
+              ))}
+            </nav>
+          ) : null}
+          <h1 className="text-lg font-semibold tracking-tight text-ink">{title}</h1>
+          {subtitle && !breadcrumbs && <p className="text-sm text-muted">{subtitle}</p>}
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
