@@ -1,4 +1,4 @@
-export type Prioridad = "Alta" | "Media" | "Baja";
+export type Prioridad = "Crítica" | "Alta" | "Media" | "Baja";
 export type Riesgo = "Crítico" | "Moderado" | "Bajo";
 export type Estado = "Nuevo" | "En curso" | "Esperando cliente" | "Resuelto";
 export type Origen =
