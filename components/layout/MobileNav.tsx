@@ -43,7 +43,7 @@ export function MobileNav() {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-surface">
+        <div className="fixed inset-0 z-50 flex flex-col bg-white">
           <div className="flex items-center justify-between border-b border-line px-6 py-4">
             <div className="flex items-center gap-2.5">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-lorenzo text-sm font-bold text-white">
@@ -78,7 +78,12 @@ export function MobileNav() {
                       : "cursor-default text-ink/30"
                   )}
                 >
-                  <Icon className="h-5 w-5" strokeWidth={2} />
+                  <Icon
+                    className={cn(
+                      "h-5 w-5",
+                      isActive ? "text-blue-800" : "group-hover:text-ink"
+                    )}
+                    strokeWidth={2} />
                   <span className="flex-1">{item.label}</span>
                   {!item.active && (
                     <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-muted">
