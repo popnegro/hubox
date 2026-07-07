@@ -28,10 +28,10 @@ export function Sidebar() {
     <aside className="hidden w-64 flex-shrink-0 border-r border-line bg-surface lg:flex lg:flex-col">
       <div className="flex items-center gap-2.5 px-6 py-6">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-lorenzo text-sm font-bold text-white">
-          CX
+          HX
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-semibold text-ink">Quality Hub</p>
+          <p className="text-sm font-semibold text-ink">Hubox</p>
           <p className="text-xs text-muted">Grupo Lorenzo</p>
         </div>
       </div>

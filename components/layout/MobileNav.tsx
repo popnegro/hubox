@@ -47,10 +47,10 @@ export function MobileNav() {
           <div className="flex items-center justify-between border-b border-line px-6 py-4">
             <div className="flex items-center gap-2.5">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-lorenzo text-sm font-bold text-white">
-                CX
+                HX
               </div>
               <div className="leading-tight">
-                <p className="text-sm font-semibold text-ink">Quality Hub</p>
+                <p className="text-sm font-semibold text-ink">Hubox</p>
                 <p className="text-xs text-muted">Grupo Lorenzo</p>
               </div>
             </div>
@@ -59,7 +59,7 @@ export function MobileNav() {
             </button>
           </div>
 
-          <nav className="flex-1 space-y-1 px-3 py-6">
+          <nav className="flex-1 space-y-1 px-3 py-6 bg-surface shadow-card">
             {NAV.map((item) => {
               const isActive = item.active && pathname === item.href;
               const Icon = item.icon;
@@ -93,13 +93,7 @@ export function MobileNav() {
                 </Link>
               );
             })}
-          </nav>
-          <div className="m-3 rounded-lg bg-canvas p-4">
-            <p className="text-sm font-medium text-ink">MVP v0.1</p>
-            <p className="mt-1 text-sm text-muted">
-              Datos de demostración. Próximo paso: conectar IA real y base de datos.
-            </p>
-          </div>
+          </nav>          
         </div>
       )}
     </div>
