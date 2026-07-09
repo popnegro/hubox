@@ -1,0 +1,6 @@
+{
+  "name": "Suraci OS",
+  "description": "La plataforma que conecta, estandariza y acelera el crecimiento de cada franquicia.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
